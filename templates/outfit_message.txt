@@ -1,0 +1,10 @@
+Good morning! Here's your outfit suggestion for today:
+
+Weather: {{ temperature }}°F, {{ description }}
+
+Outfit: {{ outfit }}
+
+Inspiration for the day:
+{{ quote }}
+
+Have a great day!
