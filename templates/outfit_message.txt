@@ -1,10 +1,11 @@
-Good morning! Here's your outfit suggestion for today:
+Good morning! Here's your outfit suggestion for today in Asheville, NC:
 
-Weather: {{ temperature }}°F, {{ description }}
+Weather: {{ weather }}
 
-Outfit: {{ outfit }}
+Today's Outfit:
+{{ outfit }}
 
 Inspiration for the day:
-{{ quote }}
+> {{ quote }}
 
-Have a great day!
+Have a great day, and stay stylish! 👗👔👟
