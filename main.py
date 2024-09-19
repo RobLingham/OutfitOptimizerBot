@@ -20,7 +20,7 @@ except ValueError as e:
 
 # Initialize and start the scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(schedule_daily_outfit_suggestion, 'cron', hour=13, minute=43, timezone='US/Eastern', id='daily_outfit_suggestion')
+scheduler.add_job(schedule_daily_outfit_suggestion, 'cron', hour=14, minute=7, timezone='US/Eastern', id='daily_outfit_suggestion')
 scheduler.start()
 
 @app.route('/')
