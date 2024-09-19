@@ -13,10 +13,15 @@ def schedule_daily_outfit_suggestion():
         logger.info("Starting daily outfit suggestion process")
 
         # Generate outfit suggestion
+        logger.info("Calling generate_outfit_suggestion function")
         suggestion = generate_outfit_suggestion()
+        logger.info("generate_outfit_suggestion function completed")
+
+        logger.info("Calling parse_outfit_suggestion function")
         weather, outfit, quote = parse_outfit_suggestion(suggestion)
+        logger.info("parse_outfit_suggestion function completed")
         
-        logger.info("Outfit suggestion generated successfully")
+        logger.info("Outfit suggestion generated and parsed successfully")
         logger.info(f"Weather: {weather}")
         logger.info(f"Outfit: {outfit}")
         logger.info(f"Quote: {quote}")

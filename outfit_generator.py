@@ -29,12 +29,14 @@ def generate_outfit_suggestion():
     '''
 
     try:
+        logger.info("Sending request to OpenAI API")
         completion = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4",  # Changed from gpt-4o to gpt-4
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1000
         )
         response = completion.choices[0].message.content
+        logger.info(f"Full OpenAI API response: {completion}")
         logger.info(f"Generated outfit suggestion: {response}")
         return response
     except Exception as e:
@@ -43,13 +45,20 @@ def generate_outfit_suggestion():
 
 def parse_outfit_suggestion(suggestion):
     logger.info(f"Parsing outfit suggestion: {suggestion}")
-    lines = suggestion.split('\n')
-    weather = next((line.split(': ', 1)[1] for line in lines if line.startswith('Weather:')), '')
-    outfit = next((line.split(': ', 1)[1] for line in lines if line.startswith('Outfit:')), '')
-    quote = next((line.split(': ', 1)[1] for line in lines if line.startswith('Quote:')), '')
-    
-    logger.info(f"Parsed weather: {weather}")
-    logger.info(f"Parsed outfit: {outfit}")
-    logger.info(f"Parsed quote: {quote}")
-    
-    return weather, outfit, quote
+    try:
+        lines = suggestion.split('\n')
+        weather = next((line.split(': ', 1)[1] for line in lines if line.startswith('Weather:')), '')
+        outfit = next((line.split(': ', 1)[1] for line in lines if line.startswith('Outfit:')), '')
+        quote = next((line.split(': ', 1)[1] for line in lines if line.startswith('Quote:')), '')
+        
+        if not all([weather, outfit, quote]):
+            raise ValueError("One or more required fields are missing from the suggestion")
+        
+        logger.info(f"Parsed weather: {weather}")
+        logger.info(f"Parsed outfit: {outfit}")
+        logger.info(f"Parsed quote: {quote}")
+        
+        return weather, outfit, quote
+    except Exception as e:
+        logger.error(f"Error parsing outfit suggestion: {str(e)}")
+        raise ValueError(f"Failed to parse outfit suggestion: {str(e)}")
