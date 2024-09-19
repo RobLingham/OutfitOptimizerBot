@@ -12,9 +12,14 @@ def generate_outfit_suggestion():
     current_date = datetime.now().strftime("%Y-%m-%d")
     
     prompt = f'''
-    Today is {current_date}. Please provide the current weather forecast for Asheville, NC, including the temperature at 9 AM and the high temperature for the day.
+    Today is {current_date}. Please provide a detailed weather forecast for Asheville, NC, including:
+    - Temperature at 9 AM
+    - High temperature for the day
+    - Humidity levels
+    - Wind conditions
+    - Any chance of precipitation
 
-    Based on this weather information, suggest an outfit for Rob, who will be dropping off his daughter at school and then working from home for the rest of the day. Rob prefers casual, comfortable clothing and may need to adapt to temperature changes. His clothing options include:
+    Based on this weather information, suggest a detailed outfit for Rob, who will be dropping off his daughter at school and then working from home for the rest of the day. Rob prefers casual, comfortable clothing and may need to adapt to temperature changes. His clothing options include:
 
     Tops: T-shirts, long sleeve T-shirts, Henleys, short sleeve button-ups, polo shirts, zip sweatshirts, button-ups/flannels, sweatshirts, cardigans, hoodies
     Bottoms: Pants, shorts
@@ -22,12 +27,17 @@ def generate_outfit_suggestion():
     Outerwear: Puffer jacket, rain jacket, chore jacket
     Socks: Ankle socks, tube socks, wool socks
 
-    Provide a concise and specific outfit suggestion for the day, avoiding too many options. Also, include a philosophical quote from Marcus Aurelius, Pascal, or a similar philosopher for inspiration.
+    Provide a comprehensive outfit suggestion for the day, including:
+    - Specific items for each part of the outfit (top, bottom, footwear, outerwear if needed)
+    - Reasoning for each choice based on the weather and Rob's activities
+    - Suggestions for adapting the outfit if the weather changes throughout the day
+
+    Also, include a philosophical quote from Marcus Aurelius, Pascal, or a similar philosopher for inspiration, along with a brief explanation of how it relates to Rob's day or the weather.
 
     Format the response as follows:
-    Weather: [Brief weather description]
-    Outfit: [Detailed outfit suggestion]
-    Quote: [Inspirational quote]
+    Weather: [Detailed weather description]
+    Outfit: [Comprehensive outfit suggestion with explanations]
+    Quote: [Inspirational quote and its relevance]
     '''
 
     try:
@@ -70,20 +80,6 @@ def parse_outfit_suggestion(suggestion):
         logger.info(f"Outfit: {outfit}")
         logger.info(f"Quote: {quote}")
 
-        if weather == default_weather or outfit == default_outfit or quote == default_quote:
-            logger.warning("One or more fields are using default values after regex parsing")
-            logger.info("Attempting fallback parsing method")
-            
-            lines = suggestion.split('\n')
-            weather = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('weather:')), weather)
-            outfit = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('outfit:')), outfit)
-            quote = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('quote:')), quote)
-
-            logger.info(f"Fallback parsing results:")
-            logger.info(f"Weather: {weather}")
-            logger.info(f"Outfit: {outfit}")
-            logger.info(f"Quote: {quote}")
-
         return weather, outfit, quote
     except Exception as e:
         logger.error(f"Error parsing outfit suggestion: {str(e)}")
@@ -93,9 +89,28 @@ def parse_outfit_suggestion(suggestion):
 # Test function
 def test_parse_outfit_suggestion():
     test_suggestion = """
-    Weather: Sunny with a high of 75°F (24°C) and a low of 60°F (16°C). Mild morning around 65°F (18°C) at 9 AM.
-    Outfit: Start with a light blue Henley shirt, paired with comfortable khaki pants. Bring a zip sweatshirt for cooler morning temperatures. Wear Vans shoes for a casual look, and choose ankle socks for comfort.
+    Weather: Partly cloudy with a temperature of 65°F (18°C) at 9 AM, rising to a high of 78°F (26°C) later in the day. Humidity is moderate at 60%. Light breeze with wind speeds of 5-10 mph. There's a 20% chance of light showers in the afternoon.
+
+    Outfit: For Rob's day of dropping off his daughter and working from home, here's a comprehensive outfit suggestion:
+
+    Top: Start with a light blue Henley shirt. The long sleeves will provide warmth in the cooler morning, but can be easily rolled up if it gets warmer. The Henley style offers a casual yet put-together look.
+
+    Bottom: Opt for a pair of comfortable khaki pants. They're versatile enough for the school drop-off and suitable for a work-from-home day. The neutral color pairs well with the light blue top.
+
+    Footwear: Choose the Vans shoes. They're casual and comfortable, perfect for driving and walking during the school drop-off. They also transition well for a day at home.
+
+    Socks: Wear ankle socks with the Vans for a clean, casual look.
+
+    Outerwear: Bring along the chore jacket. It's light enough for the mild temperature but provides an extra layer for the cooler morning or in case of light showers. The jacket can be easily removed once back home.
+
+    Adapting to weather changes:
+    - If it gets warmer in the afternoon, Rob can remove the chore jacket and roll up the sleeves of his Henley.
+    - In case of light showers, the chore jacket will provide some protection. If Rob needs to step out, he can easily throw it on.
+    - If the temperature drops unexpectedly, the long sleeves of the Henley and the chore jacket should provide adequate warmth.
+
     Quote: "The happiness of your life depends upon the quality of your thoughts." - Marcus Aurelius
+
+    This quote is particularly relevant to Rob's day. As he transitions from the potentially hectic morning routine of dropping off his daughter to a day of working from home, it's a reminder that his mindset and perspective can greatly influence his experience. Just as he's prepared for various weather possibilities with adaptable clothing choices, he can also adapt his thoughts to make the most of his day, regardless of any challenges that may arise.
     """
     weather, outfit, quote = parse_outfit_suggestion(test_suggestion)
     logger.info("Test parse_outfit_suggestion results:")
