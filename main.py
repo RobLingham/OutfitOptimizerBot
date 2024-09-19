@@ -1,5 +1,5 @@
 from flask import Flask
-from scheduler import schedule_daily_outfit_suggestion
+from scheduler import schedule_daily_outfit_suggestion, init_scheduler
 import os
 import logging
 
@@ -30,6 +30,7 @@ def test_outfit_suggestion():
     return "Outfit suggestion test triggered. Check your Slack channel and application logs.", 200
 
 if __name__ == "__main__":
+    scheduler = init_scheduler()
     logger.info("Starting Flask application")
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)

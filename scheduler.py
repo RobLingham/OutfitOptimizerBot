@@ -5,6 +5,9 @@ import os
 import time
 import logging
 from datetime import datetime, timedelta
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from pytz import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +68,18 @@ def schedule_daily_outfit_suggestion():
         error_message = f"Error in daily outfit suggestion: {str(e)}"
         logger.error(error_message)
         send_slack_message(error_message)
+
+def init_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        schedule_daily_outfit_suggestion,
+        trigger=CronTrigger(hour=7, minute=30, timezone=timezone('US/Eastern')),
+        id='daily_outfit_suggestion',
+        name='Send daily outfit suggestion at 7:30 AM EST',
+        replace_existing=True
+    )
+    scheduler.start()
+    return scheduler
 
 # For testing purposes
 if __name__ == "__main__":
