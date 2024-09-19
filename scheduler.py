@@ -22,9 +22,9 @@ def schedule_daily_outfit_suggestion():
         logger.info("parse_outfit_suggestion function completed")
         
         logger.info("Outfit suggestion generated and parsed successfully")
-        logger.info(f"Weather: {weather}")
-        logger.info(f"Outfit: {outfit}")
-        logger.info(f"Quote: {quote}")
+        logger.info(f"Parsed Weather: {weather}")
+        logger.info(f"Parsed Outfit: {outfit}")
+        logger.info(f"Parsed Quote: {quote}")
 
         # Check for empty values and use placeholders if necessary
         if not weather.strip():

@@ -3,6 +3,7 @@ from config import CLOTHING_OPTIONS, OPENAI_API_KEY
 from datetime import datetime
 import logging
 import json
+import re
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 logger = logging.getLogger(__name__)
@@ -55,20 +56,52 @@ def parse_outfit_suggestion(suggestion):
         return default_weather, default_outfit, default_quote
 
     try:
-        lines = suggestion.split('\n')
-        weather = next((line.split(': ', 1)[1] for line in lines if line.startswith('Weather:')), default_weather)
-        outfit = next((line.split(': ', 1)[1] for line in lines if line.startswith('Outfit:')), default_outfit)
-        quote = next((line.split(': ', 1)[1] for line in lines if line.startswith('Quote:')), default_quote)
-        
+        logger.info("Attempting to parse suggestion using regex")
+        weather_match = re.search(r'Weather:\s*(.*?)(?:\n|$)', suggestion, re.DOTALL)
+        outfit_match = re.search(r'Outfit:\s*(.*?)(?:\n(?:Quote:|$)|$)', suggestion, re.DOTALL)
+        quote_match = re.search(r'Quote:\s*(.*?)(?:\n|$)', suggestion, re.DOTALL)
+
+        weather = weather_match.group(1).strip() if weather_match else default_weather
+        outfit = outfit_match.group(1).strip() if outfit_match else default_outfit
+        quote = quote_match.group(1).strip() if quote_match else default_quote
+
+        logger.info(f"Regex parsing results:")
+        logger.info(f"Weather: {weather}")
+        logger.info(f"Outfit: {outfit}")
+        logger.info(f"Quote: {quote}")
+
         if weather == default_weather or outfit == default_outfit or quote == default_quote:
-            logger.warning("One or more fields are using default values")
-        
-        logger.info(f"Parsed weather: {weather}")
-        logger.info(f"Parsed outfit: {outfit}")
-        logger.info(f"Parsed quote: {quote}")
-        
+            logger.warning("One or more fields are using default values after regex parsing")
+            logger.info("Attempting fallback parsing method")
+            
+            lines = suggestion.split('\n')
+            weather = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('weather:')), weather)
+            outfit = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('outfit:')), outfit)
+            quote = next((line.split(': ', 1)[1] for line in lines if line.lower().startswith('quote:')), quote)
+
+            logger.info(f"Fallback parsing results:")
+            logger.info(f"Weather: {weather}")
+            logger.info(f"Outfit: {outfit}")
+            logger.info(f"Quote: {quote}")
+
         return weather, outfit, quote
     except Exception as e:
         logger.error(f"Error parsing outfit suggestion: {str(e)}")
         logger.warning("Using default values due to parsing error")
         return default_weather, default_outfit, default_quote
+
+# Test function
+def test_parse_outfit_suggestion():
+    test_suggestion = """
+    Weather: Sunny with a high of 75°F (24°C) and a low of 60°F (16°C). Mild morning around 65°F (18°C) at 9 AM.
+    Outfit: Start with a light blue Henley shirt, paired with comfortable khaki pants. Bring a zip sweatshirt for cooler morning temperatures. Wear Vans shoes for a casual look, and choose ankle socks for comfort.
+    Quote: "The happiness of your life depends upon the quality of your thoughts." - Marcus Aurelius
+    """
+    weather, outfit, quote = parse_outfit_suggestion(test_suggestion)
+    logger.info("Test parse_outfit_suggestion results:")
+    logger.info(f"Weather: {weather}")
+    logger.info(f"Outfit: {outfit}")
+    logger.info(f"Quote: {quote}")
+
+if __name__ == "__main__":
+    test_parse_outfit_suggestion()
