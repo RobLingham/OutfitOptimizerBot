@@ -26,6 +26,17 @@ def schedule_daily_outfit_suggestion():
         logger.info(f"Outfit: {outfit}")
         logger.info(f"Quote: {quote}")
 
+        # Check for empty values and use placeholders if necessary
+        if not weather.strip():
+            weather = "Weather data unavailable"
+            logger.warning("Empty weather data, using placeholder")
+        if not outfit.strip():
+            outfit = "Wear comfortable clothes suitable for working from home"
+            logger.warning("Empty outfit suggestion, using placeholder")
+        if not quote.strip():
+            quote = "The best preparation for tomorrow is doing your best today. - H. Jackson Brown Jr."
+            logger.warning("Empty quote, using placeholder")
+
         # Prepare message using template
         template_path = os.path.join(os.path.dirname(__file__), 'templates', 'outfit_message.txt')
         with open(template_path, 'r') as file:

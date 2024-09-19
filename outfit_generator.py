@@ -2,6 +2,7 @@ from openai import OpenAI
 from config import CLOTHING_OPTIONS, OPENAI_API_KEY
 from datetime import datetime
 import logging
+import json
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 logger = logging.getLogger(__name__)
@@ -31,12 +32,12 @@ def generate_outfit_suggestion():
     try:
         logger.info("Sending request to OpenAI API")
         completion = client.chat.completions.create(
-            model="gpt-4",  # Changed from gpt-4o to gpt-4
+            model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1000
         )
         response = completion.choices[0].message.content
-        logger.info(f"Full OpenAI API response: {completion}")
+        logger.info(f"Full OpenAI API response: {json.dumps(completion.model_dump(), indent=2)}")
         logger.info(f"Generated outfit suggestion: {response}")
         return response
     except Exception as e:
@@ -45,14 +46,18 @@ def generate_outfit_suggestion():
 
 def parse_outfit_suggestion(suggestion):
     logger.info(f"Parsing outfit suggestion: {suggestion}")
+    default_weather = "Unable to fetch weather data"
+    default_outfit = "Wear comfortable clothes suitable for working from home"
+    default_quote = "The best preparation for tomorrow is doing your best today. - H. Jackson Brown Jr."
+
     try:
         lines = suggestion.split('\n')
-        weather = next((line.split(': ', 1)[1] for line in lines if line.startswith('Weather:')), '')
-        outfit = next((line.split(': ', 1)[1] for line in lines if line.startswith('Outfit:')), '')
-        quote = next((line.split(': ', 1)[1] for line in lines if line.startswith('Quote:')), '')
+        weather = next((line.split(': ', 1)[1] for line in lines if line.startswith('Weather:')), default_weather)
+        outfit = next((line.split(': ', 1)[1] for line in lines if line.startswith('Outfit:')), default_outfit)
+        quote = next((line.split(': ', 1)[1] for line in lines if line.startswith('Quote:')), default_quote)
         
-        if not all([weather, outfit, quote]):
-            raise ValueError("One or more required fields are missing from the suggestion")
+        if weather == default_weather or outfit == default_outfit or quote == default_quote:
+            logger.warning("One or more fields are using default values")
         
         logger.info(f"Parsed weather: {weather}")
         logger.info(f"Parsed outfit: {outfit}")
@@ -61,4 +66,5 @@ def parse_outfit_suggestion(suggestion):
         return weather, outfit, quote
     except Exception as e:
         logger.error(f"Error parsing outfit suggestion: {str(e)}")
-        raise ValueError(f"Failed to parse outfit suggestion: {str(e)}")
+        logger.warning("Using default values due to parsing error")
+        return default_weather, default_outfit, default_quote
