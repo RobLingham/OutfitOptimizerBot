@@ -4,9 +4,10 @@ from config import SLACK_BOT_TOKEN, SLACK_CHANNEL
 import os
 import logging
 import json
+from datetime import datetime, timedelta
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Log the values of SLACK_CHANNEL and SLACK_BOT_TOKEN (partially masked)
@@ -14,6 +15,18 @@ logger.info(f"SLACK_CHANNEL: {SLACK_CHANNEL}")
 logger.info(f"SLACK_BOT_TOKEN: {SLACK_BOT_TOKEN[:10]}...{SLACK_BOT_TOKEN[-5:] if SLACK_BOT_TOKEN else ''}")
 
 client = WebClient(token=SLACK_BOT_TOKEN)
+
+LAST_SEND_FILE = os.path.join(os.path.dirname(__file__), 'last_send.txt')
+
+def get_last_send_time():
+    if os.path.exists(LAST_SEND_FILE):
+        with open(LAST_SEND_FILE, 'r') as f:
+            return datetime.fromisoformat(f.read().strip())
+    return None
+
+def update_last_send_time():
+    with open(LAST_SEND_FILE, 'w') as f:
+        f.write(datetime.now().isoformat())
 
 def join_channel():
     try:
@@ -26,7 +39,19 @@ def join_channel():
 
 def send_slack_message(message):
     try:
+        if not os.path.exists(LAST_SEND_FILE):
+            update_last_send_time()
+            last_send_time = None
+        else:
+            last_send_time = get_last_send_time()
+        current_time = datetime.now()
+        
+        if last_send_time and current_time - last_send_time < timedelta(minutes=5):
+            logger.info("Skipping send: Last message sent less than 5 minutes ago")
+            return False
+
         logger.info(f"Attempting to send message to channel: {SLACK_CHANNEL}")
+        logger.info(f"Full message content:\n{message}")
         
         response = client.chat_postMessage(
             channel=SLACK_CHANNEL,
@@ -34,6 +59,7 @@ def send_slack_message(message):
         )
         logger.info(f"Message sent successfully to channel {SLACK_CHANNEL}")
         logger.info(f"Response: {json.dumps(response.data, indent=2)}")
+        update_last_send_time()
         return True
     except SlackApiError as e:
         logger.error(f"Error sending message: {e}")

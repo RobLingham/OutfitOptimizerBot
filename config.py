@@ -14,10 +14,14 @@ SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL")
 if not SLACK_CHANNEL:
     raise ValueError("SLACK_CHANNEL environment variable is not set")
 
+# City configuration
+CITY = "Asheville,US"
+
 # Clothing options
 CLOTHING_OPTIONS = {
-    "tops": ["t-shirt", "blouse", "sweater", "hoodie", "jacket"],
-    "bottoms": ["jeans", "shorts", "skirt", "slacks"],
-    "footwear": ["sneakers", "sandals", "boots", "flats"],
-    "accessories": ["scarf", "hat", "sunglasses", "umbrella"]
+    "tops": ["T-shirts", "long sleeve T-shirts", "Henleys", "short sleeve button-ups", "polo shirts", "zip sweatshirts", "button-ups/flannels", "sweatshirts", "cardigans", "hoodies"],
+    "bottoms": ["pants", "shorts"],
+    "footwear": ["Vans shoes", "sneakers", "Teva sandals", "hiking boots"],
+    "outerwear": ["puffer jacket", "rain jacket", "chore jacket"],
+    "socks": ["ankle socks", "tube socks", "wool socks"]
 }

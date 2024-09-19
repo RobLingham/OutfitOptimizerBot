@@ -8,4 +8,4 @@ Today's Outfit:
 Inspiration for the day:
 > {{ quote }}
 
-Have a great day, and stay stylish! 👗👔👟
+Have a great day! 
