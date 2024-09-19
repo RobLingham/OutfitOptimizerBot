@@ -67,9 +67,9 @@ def parse_outfit_suggestion(suggestion):
 
     try:
         logger.info("Attempting to parse suggestion using regex")
-        weather_match = re.search(r'Weather:\s*(.*?)(?:\n|$)', suggestion, re.DOTALL)
-        outfit_match = re.search(r'Outfit:\s*(.*?)(?:\n(?:Quote:|$)|$)', suggestion, re.DOTALL)
-        quote_match = re.search(r'Quote:\s*(.*?)(?:\n|$)', suggestion, re.DOTALL)
+        weather_match = re.search(r'Weather:\s*(.*?)(?=\nOutfit:|$)', suggestion, re.DOTALL)
+        outfit_match = re.search(r'Outfit:\s*(.*?)(?=\nQuote:|$)', suggestion, re.DOTALL)
+        quote_match = re.search(r'Quote:\s*(.*?)$', suggestion, re.DOTALL)
 
         weather = weather_match.group(1).strip() if weather_match else default_weather
         outfit = outfit_match.group(1).strip() if outfit_match else default_outfit
