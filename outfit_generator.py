@@ -42,13 +42,17 @@ def generate_outfit_suggestion():
         return response
     except Exception as e:
         logger.error(f"Error generating outfit suggestion: {str(e)}")
-        raise
+        return None
 
 def parse_outfit_suggestion(suggestion):
     logger.info(f"Parsing outfit suggestion: {suggestion}")
     default_weather = "Unable to fetch weather data"
     default_outfit = "Wear comfortable clothes suitable for working from home"
     default_quote = "The best preparation for tomorrow is doing your best today. - H. Jackson Brown Jr."
+
+    if suggestion is None:
+        logger.error("Received None as suggestion, using default values")
+        return default_weather, default_outfit, default_quote
 
     try:
         lines = suggestion.split('\n')
