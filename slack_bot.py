@@ -45,14 +45,15 @@ def send_slack_message(message):
         else:
             last_send_time = get_last_send_time()
         current_time = datetime.now()
-        
-        if last_send_time and current_time - last_send_time < timedelta(minutes=5):
-            logger.info("Skipping send: Last message sent less than 5 minutes ago")
-            return False
+
+        # Uncomment this block if you want to limit message frequency
+        # if last_send_time and current_time - last_send_time < timedelta(minutes=5):
+        #     logger.info("Skipping send: Last message sent less than 5 minutes ago")
+        #     return False
 
         logger.info(f"Attempting to send message to channel: {SLACK_CHANNEL}")
         logger.info(f"Full message content:\n{message}")
-        
+
         response = client.chat_postMessage(
             channel=SLACK_CHANNEL,
             text=message
@@ -66,7 +67,7 @@ def send_slack_message(message):
         error_details = e.response['error']
         logger.error(f"Error details: {error_details}")
         logger.error(f"Full error response: {json.dumps(e.response.data, indent=2)}")
-        
+
         if error_details == 'not_in_channel':
             logger.info(f"Bot is not in the channel. Attempting to join...")
             if join_channel():
@@ -81,10 +82,9 @@ def send_slack_message(message):
             logger.error("Invalid authentication. Please check the SLACK_BOT_TOKEN.")
         else:
             logger.error(f"Unexpected error: {error_details}")
-        
+
         return False
 
-# Test function to check bot's access to the channel
 def check_channel_access():
     try:
         response = client.conversations_info(channel=SLACK_CHANNEL)
@@ -101,3 +101,11 @@ if check_channel_access():
     logger.info("Bot has access to the specified channel.")
 else:
     logger.error("Bot does not have access to the specified channel. Please check the setup instructions.")
+
+# For testing purposes
+if __name__ == "__main__":
+    test_message = "This is a test message from the Outfit Optimizer Bot."
+    if send_slack_message(test_message):
+        print("Test message sent successfully.")
+    else:
+        print("Failed to send test message.")
